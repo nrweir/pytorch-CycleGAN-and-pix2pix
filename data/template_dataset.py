@@ -60,7 +60,7 @@ class TemplateDataset(BaseDataset):
         # define the default transform function. You can use <base_dataset.get_transform>; You can also define your custom transform function
         self.transform = get_transform(opt)
 
-        if opt['shuffle_dataset']:
+        if self.shuffle:
             random.shuffle(self.A_paths)
             random.shuffle(self.B_paths)
 
