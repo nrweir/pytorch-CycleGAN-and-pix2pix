@@ -14,8 +14,7 @@ You need to implement the following functions:
 from data.base_dataset import BaseDataset, get_transform
 from data.image_folder import make_dataset
 import random
-from skimage.io import imread
-import torch
+from PIL import Image
 import os
 # from PIL import Image
 
@@ -80,8 +79,8 @@ class TemplateDataset(BaseDataset):
         """
         A_path = self.A_paths[index]    # needs to be a string
         B_path = self.B_paths[index]
-        data_A = imread(A_path)
-        data_B = imread(B_path)
+        data_A = Image.open(A_path).convert('RGB')
+        data_B = Image.open(B_path).convert('RGB')
         return {'A': self.transform(data_A),
                 'B': self.transform(data_B),
                 'A_paths': A_path,
