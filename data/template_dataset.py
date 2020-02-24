@@ -16,6 +16,7 @@ from data.image_folder import make_dataset
 import random
 from skimage.io import imread
 import torch
+import os
 # from PIL import Image
 
 
@@ -49,9 +50,10 @@ class TemplateDataset(BaseDataset):
         """
         # save the option and dataset root
         BaseDataset.__init__(self, opt)
-
-        self.A_paths = (make_dataset(self.dir_A, opt.max_dataset_size))   # load images from '/path/to/data/trainA'
-        self.B_paths = (make_dataset(self.dir_B, opt.max_dataset_size))    # load images from '/path/to/data/trainB'
+        self.dir_A = os.path.join(opt.dataroot, opt.phase + 'A')
+        self.dir_B = os.path.join(opt.dataroot, opt.phase + 'B')
+        self.A_paths = make_dataset(self.dir_A, opt.max_dataset_size)   # load images from '/path/to/data/trainA'
+        self.B_paths = make_dataset(self.dir_B, opt.max_dataset_size)    # load images from '/path/to/data/trainB'
         self.A_size = len(self.A_paths)  # get the size of dataset A
         self.B_size = len(self.B_paths)  # get the size of dataset B
         self.shuffle = opt.get('shuffle_dataset')
@@ -78,8 +80,8 @@ class TemplateDataset(BaseDataset):
         """
         A_path = self.A_paths[index]    # needs to be a string
         B_path = self.B_paths[index]
-        data_A = torch.from_numpy(imread(A_path))
-        data_B = torch.from_numpy(imread(B_path))
+        data_A = imread(A_path)
+        data_B = imread(B_path)
         return {'A': self.transform(data_A),
                 'B': self.transform(data_B),
                 'A_paths': A_path,
@@ -87,7 +89,7 @@ class TemplateDataset(BaseDataset):
 
     def __len__(self):
         """Return the total number of images."""
-        return len(self.image_paths)
+        return min(self.A_size, self.B_size)
 
     def on_epoch_end(self):
         """Shuffle the order of images in data_A and data_B."""

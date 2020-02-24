@@ -76,5 +76,5 @@ if __name__ == '__main__':
 
         print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.n_epochs + opt.n_epochs_decay, time.time() - epoch_start_time))
         model.update_learning_rate()                     # update learning rates at the end of every epoch.
-        if opt['dataset_mode'] == 'template':
+        if opt.dataset_mode == 'template':
             dataset.on_epoch_end()  # shuffle if that's in the options
