@@ -12,7 +12,10 @@ You need to implement the following functions:
     -- <__len__>: Return the number of images.
 """
 from data.base_dataset import BaseDataset, get_transform
-# from data.image_folder import make_dataset
+from data.image_folder import make_dataset
+import random
+from skimage.io import imread
+import torch
 # from PIL import Image
 
 
@@ -29,8 +32,8 @@ class TemplateDataset(BaseDataset):
         Returns:
             the modified parser.
         """
-        parser.add_argument('--new_dataset_option', type=float, default=1.0, help='new dataset option')
-        parser.set_defaults(max_dataset_size=10, new_dataset_option=2.0)  # specify dataset-specific default values
+        parser.add_argument('--shuffle_dataset', action=store_true, default=False, help='shuffle dataset samples')
+        # parser.set_defaults(max_dataset_size=10, new_dataset_option=2.0)  # specify dataset-specific default values
         return parser
 
     def __init__(self, opt):
@@ -46,10 +49,18 @@ class TemplateDataset(BaseDataset):
         """
         # save the option and dataset root
         BaseDataset.__init__(self, opt)
-        # get the image paths of your dataset;
-        self.image_paths = []  # You can call sorted(make_dataset(self.root, opt.max_dataset_size)) to get all the image paths under the directory self.root
+
+        self.A_paths = (make_dataset(self.dir_A, opt.max_dataset_size))   # load images from '/path/to/data/trainA'
+        self.B_paths = (make_dataset(self.dir_B, opt.max_dataset_size))    # load images from '/path/to/data/trainB'
+        self.A_size = len(self.A_paths)  # get the size of dataset A
+        self.B_size = len(self.B_paths)  # get the size of dataset B
+        self.shuffle = opt.get('shuffle_dataset')
         # define the default transform function. You can use <base_dataset.get_transform>; You can also define your custom transform function
         self.transform = get_transform(opt)
+
+        if opt['shuffle_dataset']:
+            random.shuffle(self.A_paths)
+            random.shuffle(self.B_paths)
 
     def __getitem__(self, index):
         """Return a data point and its metadata information.
@@ -65,11 +76,21 @@ class TemplateDataset(BaseDataset):
         Step 3: convert your data to a PyTorch tensor. You can use helpder functions such as self.transform. e.g., data = self.transform(image)
         Step 4: return a data point as a dictionary.
         """
-        path = 'temp'    # needs to be a string
-        data_A = None    # needs to be a tensor
-        data_B = None    # needs to be a tensor
-        return {'data_A': data_A, 'data_B': data_B, 'path': path}
+        A_path = self.A_paths[index]    # needs to be a string
+        B_path = self.B_paths[index]
+        data_A = torch.from_numpy(imread(A_path))
+        data_B = torch.from_numpy(imread(B_path))
+        return {'A': self.transform(data_A),
+                'B': self.transform(data_B),
+                'A_paths': A_path,
+                'B_paths': B_path}
 
     def __len__(self):
         """Return the total number of images."""
         return len(self.image_paths)
+
+    def on_epoch_end(self):
+        """Shuffle the order of images in data_A and data_B."""
+        if self.shuffle:
+            random.shuffle(self.A_paths)
+            random.shuffle(self.B_paths)
