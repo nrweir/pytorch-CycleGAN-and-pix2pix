@@ -56,7 +56,7 @@ class TemplateDataset(BaseDataset):
         self.B_paths = make_dataset(self.dir_B, opt.max_dataset_size)    # load images from '/path/to/data/trainB'
         self.A_size = len(self.A_paths)  # get the size of dataset A
         self.B_size = len(self.B_paths)  # get the size of dataset B
-        self.shuffle = opt.get('shuffle_dataset')
+        self.shuffle = opt.shuffle_dataset
         # define the default transform function. You can use <base_dataset.get_transform>; You can also define your custom transform function
         self.transform = get_transform(opt)
 
