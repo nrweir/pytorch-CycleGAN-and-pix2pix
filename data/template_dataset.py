@@ -33,7 +33,7 @@ class TemplateDataset(BaseDataset):
         Returns:
             the modified parser.
         """
-        parser.add_argument('--shuffle_dataset', action=store_true, default=False, help='shuffle dataset samples')
+        parser.add_argument('--shuffle_dataset', action='store_true', default=False, help='shuffle dataset samples')
         # parser.set_defaults(max_dataset_size=10, new_dataset_option=2.0)  # specify dataset-specific default values
         return parser
 

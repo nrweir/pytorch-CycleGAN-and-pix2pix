@@ -6,6 +6,7 @@ python train.py \
   --checkpoints-dir /local_data/cosmiq/wdata/rareplanes/cyclegan_checkpoints/v1/ \
   --model cycle_gan  \
   --dataset_mode template \
+  --shuffle_dataset
   --pool_size 50 \
   --no_dropout \
   --num_threads 12 \
